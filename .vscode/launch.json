@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CampusSecondhandPlatformApplication",
+            "request": "launch",
+            "mainClass": "com.campus.secondhand.CampusSecondhandPlatformApplication",
+            "projectName": ""
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-CampusSecondhandApplication<campus-secondhand>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.campus.secondhand.CampusSecondhandApplication",
+            "projectName": "campus-secondhand",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

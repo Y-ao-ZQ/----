@@ -1,0 +1,24 @@
+# 依赖目录
+node_modules/
+target/
+
+# 编译输出
+*.class
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# IDE 配置
+.idea/
+.vscode/
+*.iml
+
+# 临时文件
+*.tmp
+*.bak
+
+# 环境配置
+.env
+.env.local
