@@ -30,4 +30,22 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      * 统计指定状态的商品数量
      */
     long countByStatus(Integer status);
+    
+    /**
+     * 查询未删除的商品（逻辑删除过滤）
+     */
+    @Query("SELECT p FROM Product p WHERE p.deleted = false AND p.status = ?1")
+    Page<Product> findByStatusAndNotDeleted(Integer status, Pageable pageable);
+    
+    /**
+     * 查询卖家的未删除商品
+     */
+    @Query("SELECT p FROM Product p WHERE p.deleted = false AND p.sellerId = ?1")
+    Page<Product> findBySellerIdAndNotDeleted(Long sellerId, Pageable pageable);
+    
+    /**
+     * 查询卖家的指定状态且未删除的商品
+     */
+    @Query("SELECT p FROM Product p WHERE p.deleted = false AND p.sellerId = ?1 AND p.status = ?2")
+    Page<Product> findBySellerIdAndStatusAndNotDeleted(Long sellerId, Integer status, Pageable pageable);
 }

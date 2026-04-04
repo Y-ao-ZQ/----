@@ -40,7 +40,31 @@
                 placeholder="请输入密码" 
                 show-password
                 class="custom-input"
+                @input="checkPasswordStrength"
               />
+            </div>
+            <!-- 密码强度指示器 -->
+            <div class="password-strength" v-if="form.password">
+              <div class="strength-bars">
+                <div 
+                  class="strength-bar" 
+                  :class="getStrengthClass(0)"
+                  :style="{ opacity: getStrengthOpacity(0) }"
+                ></div>
+                <div 
+                  class="strength-bar" 
+                  :class="getStrengthClass(1)"
+                  :style="{ opacity: getStrengthOpacity(1) }"
+                ></div>
+                <div 
+                  class="strength-bar" 
+                  :class="getStrengthClass(2)"
+                  :style="{ opacity: getStrengthOpacity(2) }"
+                ></div>
+              </div>
+              <span class="strength-text" :class="strengthTextClass">
+                {{ strengthText }}
+              </span>
             </div>
           </el-form-item>
           
@@ -135,6 +159,11 @@ const form = reactive({
   email: ''
 })
 
+// 密码强度相关
+const passwordStrength = ref(0)
+const strengthText = ref('')
+const strengthTextClass = ref('')
+
 const validateConfirmPassword = (rule, value, callback) => {
   if (value !== form.password) {
     callback(new Error('两次输入的密码不一致'))
@@ -143,13 +172,91 @@ const validateConfirmPassword = (rule, value, callback) => {
   }
 }
 
+const validatePasswordStrength = (rule, value, callback) => {
+  if (!value) {
+    callback()
+    return
+  }
+  
+  if (value.length < 6) {
+    callback(new Error('密码长度至少为 6 位'))
+    return
+  }
+  
+  if (value.length > 32) {
+    callback(new Error('密码长度不能超过 32 位'))
+    return
+  }
+  
+  const hasDigit = /\d/.test(value)
+  const hasLetter = /[a-zA-Z]/.test(value)
+  
+  if (!hasDigit || !hasLetter) {
+    callback(new Error('密码必须包含数字和字母'))
+    return
+  }
+  
+  callback()
+}
+
+const checkPasswordStrength = () => {
+  const password = form.password
+  if (!password) {
+    passwordStrength.value = 0
+    strengthText.value = ''
+    return
+  }
+  
+  let strength = 0
+  
+  // 长度评分
+  if (password.length >= 6) strength++
+  if (password.length >= 10) strength++
+  
+  // 复杂度评分
+  const hasDigit = /\d/.test(password)
+  const hasLower = /[a-z]/.test(password)
+  const hasUpper = /[A-Z]/.test(password)
+  const hasSpecial = /[^a-zA-Z0-9]/.test(password)
+  
+  const complexity = [hasDigit, hasLower, hasUpper, hasSpecial].filter(Boolean).length
+  
+  if (complexity >= 2) strength++
+  if (complexity >= 3) strength++
+  
+  // 归一化到 0-2
+  passwordStrength.value = Math.min(2, Math.floor(strength / 2))
+  
+  // 设置强度文本
+  if (passwordStrength.value === 0) {
+    strengthText.value = '弱'
+    strengthTextClass.value = 'strength-weak'
+  } else if (passwordStrength.value === 1) {
+    strengthText.value = '中'
+    strengthTextClass.value = 'strength-medium'
+  } else {
+    strengthText.value = '强'
+    strengthTextClass.value = 'strength-strong'
+  }
+}
+
+const getStrengthClass = (index) => {
+  if (index === 0) return 'strength-weak'
+  if (index === 1) return 'strength-medium'
+  return 'strength-strong'
+}
+
+const getStrengthOpacity = (index) => {
+  return index <= passwordStrength.value ? 1 : 0.3
+}
+
 const rules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, message: '密码长度不能少于 6 位', trigger: 'blur' }
+    { validator: validatePasswordStrength, trigger: 'blur' }
   ],
   confirmPassword: [
     { required: true, message: '请确认密码', trigger: 'blur' },
@@ -384,6 +491,60 @@ const handleRegister = async () => {
 
 .custom-input:deep(.el-input__inner::placeholder) {
   color: var(--text-muted);
+}
+
+/* 密码强度指示器样式 */
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 0 4px;
+}
+
+.strength-bars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.strength-bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  opacity: 0.3;
+}
+
+.strength-bar.strength-weak {
+  background-color: #f56c6c;
+}
+
+.strength-bar.strength-medium {
+  background-color: #e6a23c;
+}
+
+.strength-bar.strength-strong {
+  background-color: #67c23a;
+}
+
+.strength-text {
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 30px;
+  transition: all 0.3s ease;
+}
+
+.strength-text.strength-weak {
+  color: #f56c6c;
+}
+
+.strength-text.strength-medium {
+  color: #e6a23c;
+}
+
+.strength-text.strength-strong {
+  color: #67c23a;
 }
 
 .register-btn {

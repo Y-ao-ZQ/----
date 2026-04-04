@@ -56,6 +56,11 @@ public class Product {
     @Column(nullable = false)
     private Integer likeCount = 0;
     
+    @Column(nullable = false)
+    private Boolean deleted = false;
+    
+    private LocalDateTime deleteTime;
+    
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createTime;

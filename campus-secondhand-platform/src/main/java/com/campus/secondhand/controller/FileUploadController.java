@@ -43,11 +43,17 @@ public class FileUploadController {
         }
 
         try {
+            // 使用绝对路径
+            String baseDir = System.getProperty("user.dir");
+            Path uploadDir = Paths.get(baseDir, uploadPath);
+            
             // 创建上传目录
-            Path uploadDir = Paths.get(uploadPath);
             if (!Files.exists(uploadDir)) {
                 Files.createDirectories(uploadDir);
+                System.out.println("创建上传目录：" + uploadDir.toAbsolutePath());
             }
+            
+            System.out.println("上传目录：" + uploadDir.toAbsolutePath());
 
             // 生成文件名
             String originalFilename = file.getOriginalFilename();
@@ -68,6 +74,7 @@ public class FileUploadController {
 
             // 保存文件
             Path filePath = uploadDir.resolve(filename);
+            System.out.println("保存文件路径：" + filePath.toAbsolutePath());
             file.transferTo(filePath.toFile());
 
             // 返回访问 URL
@@ -116,8 +123,11 @@ public class FileUploadController {
             }
 
             try {
+                // 使用绝对路径
+                String baseDir = System.getProperty("user.dir");
+                Path uploadDir = Paths.get(baseDir, uploadPath);
+                
                 // 创建上传目录
-                Path uploadDir = Paths.get(uploadPath);
                 if (!Files.exists(uploadDir)) {
                     Files.createDirectories(uploadDir);
                 }

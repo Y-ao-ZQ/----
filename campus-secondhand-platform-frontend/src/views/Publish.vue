@@ -209,12 +209,6 @@ const handleSubmit = async () => {
   
   await formRef.value.validate(async (valid) => {
     if (valid) {
-      // 检查是否上传了图片
-      if (fileList.value.length === 0) {
-        ElMessage.warning('请至少上传一张商品图片')
-        return
-      }
-      
       loading.value = true
       try {
         await createProduct(form)
